@@ -65,10 +65,15 @@ export function loginUser(req, res) {
           isDisabled: user.isDisabled,
           isEmailVerified: user.isEmailVerified,
         };
-        const token = jwt.sign(UserData, "random456");
+        console.log(UserData);
+        const token = jwt.sign(UserData, process.env.JWT_SECRET_KEY, {
+          expiresIn: "48h",
+        });
+
         res.json({
           message: "Login Succesfull",
           token: token,
+          user: UserData,
         });
       } else {
         res.json({
