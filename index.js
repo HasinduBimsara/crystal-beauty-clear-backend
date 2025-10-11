@@ -6,12 +6,7 @@ import jwt from "jsonwebtoken";
 import productRouter from "./routes/productRouter.js";
 import { verifyJWT } from "./middlewear/auth.js";
 import orderRouter from "./routes/orderRouter.js";
-import dotenv from "dotenv";
 import cors from "cors";
-
-app.use(cors());
-dotenv.config();
-
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => {
@@ -22,6 +17,8 @@ mongoose
   });
 
 let app = express();
+
+app.use(cors());
 app.use(bodyParser.json());
 app.use(verifyJWT);
 

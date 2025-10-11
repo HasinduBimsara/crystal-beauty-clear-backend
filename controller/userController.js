@@ -24,7 +24,7 @@ export function saveUser(req, res) {
     lastName: req.body.lastName,
     password: hashPassword,
     phone: req.body.phone || "not given",
-    role: req.body.role,
+    role: req.body.role || "customer",
   });
 
   user
