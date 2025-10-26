@@ -116,3 +116,30 @@ export function getTotal() {
   });
   return total;
 }
+export async function updateOrder(req, res) {
+  try {
+    if (req.user == null) {
+      res.status(401).json({
+        message: "Unauthorized",
+      });
+      return;
+    }
+
+    if (req.user.role != "admin") {
+      res.status(403).json({
+        message: "You are not authorized to update an oredr",
+      });
+      return;
+    }
+    const orderId = req.params.orderId;
+    const order = await Order.findOneAndUpdate({ orderId: orderId }, req.boby);
+
+    res.json({
+      message: "Order updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Order not updated",
+    });
+  }
+}

@@ -83,3 +83,54 @@ export function loginUser(req, res) {
     }
   });
 }
+export async function googleLogin(req, res) {
+  const accessToken = req.body.accessToken;
+
+  try {
+    const response = await axios.get(
+      "https://www.googleapis.com/oauth2/v3/userinfo",
+      {
+        headers: {
+          Authorization: "Bearer " + accessToken,
+        },
+      }
+    );
+    const user = await User.findOne({
+      email: "Google login failed",
+    });
+    if (user == null) {
+      const newUser = new User({
+        email: response.data.email,
+        firstName: response.data.given_name,
+        lastName: response.data.family_name,
+        isEmailVerified: true,
+        password: accessToken,
+      });
+      await newUser.save();
+    } else {
+      const UserData = {
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        phone: user.phone,
+        isDisabled: user.isDisabled,
+        isEmailVerified: user.isEmailVerified,
+      };
+      console.log(UserData);
+      const token = jwt.sign(UserData, process.env.JWT_SECRET_KEY, {
+        expiresIn: "48h",
+      });
+
+      res.json({
+        message: "Login Succesfull",
+        token: token,
+        user: UserData,
+      });
+    }
+  } catch (e) {
+    res.status(500).json({
+      message: "Google Login failed",
+    });
+  }
+}
