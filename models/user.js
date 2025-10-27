@@ -21,21 +21,23 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-
     required: true,
   },
   phone: {
     type: String,
     required: true,
-    default: "not given",
+    default: "Not given",
   },
   isDisabled: {
     type: Boolean,
-    default: false,
     required: true,
+    default: false,
   },
-  isEmailVerified: { type: Boolean, required: true, default: false },
+  isEmailVerified: {
+    type: Boolean,
+    required: true,
+    default: false,
+  },
 });
-
 const User = mongoose.model("users", userSchema);
 export default User;

@@ -1,17 +1,16 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
-export function verifyJWT(req, res, next) {
-  const authHeader = req.header("Authorization");
-  if (authHeader) {
-    const token = authHeader.replace("Bearer ", "");
-    try {
-      const decoded = jwt.verify(token, "random456"); // your secret key
-      req.user = decoded;
-    } catch (err) {
-      console.log("Invalid token:", err.message);
-      req.user = null;
-    }
+export default function verifyJWT(req, res, next) {
+  const header = req.header("Authorization");
+  if (header != null) {
+    const token = header.replace("Bearer ", "");
+    jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
+      console.log(decoded);
+      if (decoded != null) {
+        req.user = decoded;
+      }
+    });
   }
   next();
 }

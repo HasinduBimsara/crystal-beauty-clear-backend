@@ -1,15 +1,16 @@
 import Product from "../models/product.js";
+
 export async function createProduct(req, res) {
-  if (!req.user) {
+  if (req.user == null) {
     res.status(403).json({
-      message: "you need to login first ",
+      message: "You need to login first",
     });
     return;
   }
 
   if (req.user.role != "admin") {
     res.status(403).json({
-      message: "you are not allowed to add product",
+      message: "You are not authorized to create a product",
     });
     return;
   }
@@ -21,25 +22,27 @@ export async function createProduct(req, res) {
       message: "Product saved successfully",
     });
   } catch (err) {
+    console.log(err);
     res.status(500).json({
       message: "Product not saved",
     });
   }
 }
+
 export function getProducts(req, res) {
   Product.find()
     .then((products) => {
       res.json(products);
     })
     .catch((err) => {
-      console.log(err);
       res.status(500).json({
-        message: "could not fetch products",
+        message: "Products not found",
       });
     });
 }
 export async function getProductById(req, res) {
   const productId = req.params.id;
+  console.log(productId);
   const product = await Product.findOne({ productId: productId });
   if (product == null) {
     res.status(404).json({
@@ -51,76 +54,86 @@ export async function getProductById(req, res) {
     product: product,
   });
 }
+
 export function deleteProduct(req, res) {
-  if (!req.user) {
+  if (req.user == null) {
     res.status(403).json({
-      message: "you need to login first",
+      message: "You need to login first",
     });
     return;
   }
 
-  if (req.user.role !== "admin") {
+  if (req.user.role != "admin") {
     res.status(403).json({
-      message: "you are not allowed to delete product",
+      message: "You are not authorized to delete a product",
     });
     return;
   }
-  const productId = req.params.id;
 
-  Product.findByIdAndDelete(productId)
-    .then((product) => {
-      if (!product) {
-        res.status(404).json({
-          message: "product not found",
-        });
-      } else {
-        res.json({
-          message: "product deleted",
-        });
-      }
+  Product.findOneAndDelete({
+    productId: req.params.productId,
+  })
+    .then(() => {
+      res.json({
+        message: "Product deleted successfully",
+      });
     })
     .catch((err) => {
-      console.log(err);
       res.status(500).json({
-        message: "could not delete product",
+        message: "Product not deleted",
       });
     });
 }
 
 export function updateProduct(req, res) {
-  if (!req.user) {
+  if (req.user == null) {
     res.status(403).json({
-      message: "you need to login first",
+      message: "You need to login first",
     });
     return;
   }
 
-  if (req.user.role !== "admin") {
+  if (req.user.role != "admin") {
     res.status(403).json({
-      message: "you are not allowed to update product",
+      message: "You are not authorized to update a product",
     });
     return;
   }
 
-  const productId = req.params.id;
-
-  Product.findByIdAndUpdate(productId, req.body, { new: true })
-    .then((product) => {
-      if (!product) {
-        res.status(404).json({
-          message: "product not found",
-        });
-      } else {
-        res.json({
-          message: "product updated",
-          product,
-        });
-      }
+  Product.findOneAndUpdate(
+    {
+      productId: req.params.productId,
+    },
+    req.body
+  )
+    .then(() => {
+      res.json({
+        message: "Product updated successfully",
+      });
     })
     .catch((err) => {
-      console.log(err);
       res.status(500).json({
-        message: "could not update product",
+        message: "Product not updated",
       });
     });
+}
+
+export async function searchProduct(req, res) {
+  const search = req.params.id;
+  try {
+    const products = await Product.find({
+      $or: [
+        { name: { $regex: search, $options: "i" } },
+        { altNames: { $elemMatch: { $regex: search, $options: "i" } } },
+      ],
+    });
+    res.json({
+      products: products,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Error in searching product",
+    });
+    return;
+  }
 }

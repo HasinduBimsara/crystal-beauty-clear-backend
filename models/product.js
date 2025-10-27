@@ -10,7 +10,7 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  altName: {
+  altNames: {
     type: [String],
     default: [],
   },
@@ -18,11 +18,10 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  labledPrice: {
+  labeledPrice: {
     type: Number,
     required: true,
   },
-
   description: {
     type: String,
     required: true,
@@ -30,12 +29,15 @@ const productSchema = new mongoose.Schema({
   images: {
     type: [String],
     required: true,
-    default: [],
+    default: [
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyrVHW3ETfRAAtf780OQqLRYM6inchgfNgQg&s",
+    ],
   },
   stock: {
     type: Number,
     required: true,
   },
 });
+
 const Product = mongoose.model("products", productSchema);
 export default Product;

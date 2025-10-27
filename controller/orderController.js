@@ -1,14 +1,14 @@
-import Order from "../models/orders.js";
+import Order from "../models/oder.js";
 import Product from "../models/product.js";
 
 export async function createOrder(req, res) {
   if (req.user == null) {
-    res.status(403).json({
-      message: "Unauthorized user",
+    res.status(401).json({
+      message: "Unauthorized",
     });
-
     return;
   }
+
   const body = req.body;
   const orderData = {
     orderId: "",
@@ -19,7 +19,6 @@ export async function createOrder(req, res) {
     billItems: [],
     total: 0,
   };
-
   Order.find()
     .sort({
       date: -1,
@@ -27,16 +26,17 @@ export async function createOrder(req, res) {
     .limit(1)
     .then(async (lastBills) => {
       if (lastBills.length == 0) {
-        orderData.orderId = "ORD001";
+        orderData.orderId = "ORD0001";
       } else {
         const lastBill = lastBills[0];
-        const lastOrderId = lastBill.orderId;
-        const lastOrderNumber = lastOrderId.replace("ORD", "");
-        const lastOrderNumberInt = parseInt(lastOrderNumber);
-        const newOrderNumberInt = lastOrderNumberInt + 1;
-        const newOrderNumberStr = newOrderNumberInt.toString().padStart(4, "0");
+        const lastOrderId = lastBill.orderId; //"ORD0061"
+        const lastOrderNumber = lastOrderId.replace("ORD", ""); //"0061"
+        const lastOrderNumberInt = parseInt(lastOrderNumber); //61
+        const newOrderNumberInt = lastOrderNumberInt + 1; //62
+        const newOrderNumberStr = newOrderNumberInt.toString().padStart(4, "0"); // "0062"
         orderData.orderId = "ORD" + newOrderNumberStr;
       }
+
       for (let i = 0; i < body.billItems.length; i++) {
         const product = await Product.findOne({
           productId: body.billItems[i].productId,
@@ -46,10 +46,11 @@ export async function createOrder(req, res) {
             message:
               "Product with product id " +
               body.billItems[i].productId +
-              "not found",
+              " not found",
           });
           return;
         }
+
         orderData.billItems[i] = {
           productId: product.productId,
           productName: product.name,
@@ -62,30 +63,32 @@ export async function createOrder(req, res) {
       }
 
       const order = new Order(orderData);
+
       order
         .save()
         .then(() => {
           res.json({
-            message: "Order Created",
+            message: "Order saved successfully",
           });
         })
         .catch((err) => {
           console.log(err);
-          res.status({
-            message: "order not saved",
+          res.status(500).json({
+            message: "Order not saved",
           });
         });
     });
 }
+
 export function getOrders(req, res) {
   if (req.user == null) {
-    res.status(403).json({
-      message: "unauthorized user",
+    res.status(401).json({
+      message: "Unauthorized",
     });
     return;
   }
 
-  if (req.user.admin) {
+  if (req.user.role == "admin") {
     Order.find()
       .then((orders) => {
         res.json(orders);
@@ -96,7 +99,9 @@ export function getOrders(req, res) {
         });
       });
   } else {
-    Order.find({ email: req.user.email })
+    Order.find({
+      email: req.user.email,
+    })
       .then((orders) => {
         res.json(orders);
       })
@@ -108,14 +113,6 @@ export function getOrders(req, res) {
   }
 }
 
-export function getTotal() {
-  let cart = getCart();
-  let total = 0;
-  cart.forEach((product) => {
-    total += product.price * product.quantity;
-  });
-  return total;
-}
 export async function updateOrder(req, res) {
   try {
     if (req.user == null) {
@@ -127,12 +124,13 @@ export async function updateOrder(req, res) {
 
     if (req.user.role != "admin") {
       res.status(403).json({
-        message: "You are not authorized to update an oredr",
+        message: "You are not authorized to update an order",
       });
       return;
     }
+
     const orderId = req.params.orderId;
-    const order = await Order.findOneAndUpdate({ orderId: orderId }, req.boby);
+    const order = await Order.findOneAndUpdate({ orderId: orderId }, req.body);
 
     res.json({
       message: "Order updated successfully",

@@ -26,7 +26,7 @@ const orderSchema = new mongoose.Schema({
   status: {
     type: String,
     required: true,
-    default: "pending",
+    default: "Pending",
   },
   phoneNumber: {
     type: String,
@@ -36,10 +36,10 @@ const orderSchema = new mongoose.Schema({
     type: [
       {
         productId: String,
-        quantity: Number,
-        price: Number,
         productName: String,
         image: String,
+        quantity: Number,
+        price: Number,
       },
     ],
     required: true,
@@ -51,5 +51,4 @@ const orderSchema = new mongoose.Schema({
 });
 
 const Order = mongoose.model("orders", orderSchema);
-
 export default Order;
