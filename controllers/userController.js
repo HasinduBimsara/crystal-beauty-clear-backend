@@ -13,7 +13,7 @@ const transport = nodemailer.createTransport({
   port: 587,
   secure: false,
   auth: {
-    user: "hasindubimsara@gmail.com",
+    user: "bimsarapremarathna123@gmail.com",
     pass: "2002",
   },
 });
@@ -200,7 +200,7 @@ export function sendOTP(req, res) {
   const otp = Math.floor(Math.random() * 9000) + 1000;
 
   const message = {
-    from: "hasindubimsara123@gmail.com",
+    from: "bimsarapremarathna123@gmail.com",
     to: email,
     subject: "OTP for email verification",
     text: "Your OTP is : " + otp,
