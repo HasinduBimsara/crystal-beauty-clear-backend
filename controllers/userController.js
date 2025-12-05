@@ -1,5 +1,5 @@
 import User from "../models/user.js";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import axios from "axios";
@@ -13,8 +13,8 @@ const transport = nodemailer.createTransport({
   port: 587,
   secure: false,
   auth: {
-    user: "bimsarapremarathna123@gmail.com",
-    pass: "2002",
+    user: "hasindubimsara123@gmail.com",
+    pass: "irlmbaqjgubrdywb",
   },
 });
 
@@ -71,10 +71,6 @@ export function loginUser(req, res) {
     } else {
       const isPasswordCorrect = bcrypt.compareSync(password, user.password);
 
-      //check for user.isDisabled
-      //check for invalid attempts
-      //if invalid attempts > 3 AND user.blockUntil > Date.now() res
-
       if (isPasswordCorrect) {
         const userData = {
           email: user.email,
@@ -100,11 +96,6 @@ export function loginUser(req, res) {
         res.status(403).json({
           message: "Invalid password",
         });
-        //user -> blockUntil = Date.now() + 5*60*1000
-        //user -> inValidAttempts = default=0 +1
-        //if(user.inValidAttempts > 3){
-        //	user.isDisabled = true
-        //
       }
     }
   });
@@ -200,7 +191,7 @@ export function sendOTP(req, res) {
   const otp = Math.floor(Math.random() * 9000) + 1000;
 
   const message = {
-    from: "bimsarapremarathna123@gmail.com",
+    from: "hasindubimsara123@gmail.com",
     to: email,
     subject: "OTP for email verification",
     text: "Your OTP is : " + otp,
